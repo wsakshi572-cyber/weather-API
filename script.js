@@ -1,38 +1,20 @@
 async function getWeather() {
-    const city = document.getElementById('city').value.trim();
-    const weatherDiv = document.getElementById('weather');
+    const city = document.getElementById("city").value;
 
-    if (!city) {
-        alert("Please enter a city name!");
-        return;
-    }
+    const apiKey = "db5435aa0b4b484872e7dd9fd9c436a9";  // Replace this
+    const url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric`;
 
-    weatherDiv.innerHTML = "Loading...";
+    const response = await fetch(url);
+    const data = await response.json();
 
-    try {
-        const response = await fetch(`https://wttr.in/${city}?format=j1`);
-        const data = await response.json();
-
-        const today = data.current_condition[0];
-
-        // Choose an icon based on weather description
-        let icon = '';
-        const desc = today.weatherDesc[0].value.toLowerCase();
-        if (desc.includes('sun') || desc.includes('clear')) icon = '☀️';
-        else if (desc.includes('cloud')) icon = '☁️';
-        else if (desc.includes('rain') || desc.includes('drizzle')) icon = '🌧️';
-        else if (desc.includes('snow')) icon = '❄️';
-        else icon = '🌤️';
-
-        weatherDiv.innerHTML = `
-            <div class="weather-icon">${icon}</div>
-            <strong>${city}</strong><br>
-            ${today.weatherDesc[0].value}<br>
-            Temp: ${today.temp_C}°C | Feels like: ${today.FeelsLikeC}°C<br>
-            Humidity: ${today.humidity}%
+    if (data.cod == 200) {
+        document.getElementById("result").innerHTML = `
+            <h2>${data.name}</h2>
+            <p>🌡️ Temp: ${data.main.temp}°C</p>
+            <p>🌥️ Weather: ${data.weather[0].main}</p>
+            <p>💨 Wind: ${data.wind.speed} km/h</p>
         `;
-    } catch (error) {
-        console.error(error);
-        weatherDiv.innerHTML = "Error fetching weather data!";
+    } else {
+        document.getElementById("result").innerHTML = "City not found!";
     }
 }
